@@ -36,11 +36,9 @@ export default function Board() {
   const winner = calculateWinner(squares);
   let status = '';
   // Jika ada pemenang, atur status sebagai pemenang, jika tidak, atur status sebagai giliran pemain berikutnya
-  if (winner) {
-    status = 'Winner:' + winner;
-  } else {
-    status = 'Next Player: ' + (xIsNext ? 'X' : 'O');
-  }
+  status = winner
+    ? 'Winner: ' + winner
+    : 'Next Player: ' + (xIsNext ? 'X' : 'O');
 
   return (
     <>
