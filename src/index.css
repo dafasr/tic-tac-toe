@@ -24,3 +24,7 @@ body {
   height: 105px;
   width: 105px;
 }
+
+.status {
+  margin-bottom: 10px;
+}
