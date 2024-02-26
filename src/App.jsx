@@ -2,9 +2,10 @@
 import { useState } from 'react';
 
 // Komponen Square yang mewakili kotak dalam papan permainan
-function Square({ value, onSquareClick }) {
+function Square({ value, onClick }) {
+  // Mengganti prop onSquareClick menjadi onClick
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button className="square" onClick={onClick}>
       {value}
     </button>
   );
@@ -28,9 +29,8 @@ function Board({ xIsNext, squares, onPlay }) {
 
   // Tentukan pemenang berdasarkan status kotak
   const winner = calculateWinner(squares);
-  let status = '';
-  // Jika ada pemenang, atur status sebagai pemenang, jika tidak, atur status sebagai giliran pemain berikutnya
-  status = winner
+  // Gunakan operator ternary untuk mengatur status
+  const status = winner
     ? 'Winner: ' + winner
     : 'Next Player: ' + (xIsNext ? 'X' : 'O');
 
@@ -41,11 +41,7 @@ function Board({ xIsNext, squares, onPlay }) {
       {/* Tampilkan papan permainan */}
       <div className="board">
         {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <Square
-            key={i}
-            value={squares[i]}
-            onSquareClick={() => handleClick(i)}
-          />
+          <Square key={i} value={squares[i]} onClick={() => handleClick(i)} />
         ))}
       </div>
     </>
@@ -55,22 +51,30 @@ function Board({ xIsNext, squares, onPlay }) {
 export default function Game() {
   const [xIsNext, setXIsNext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]);
-  const currentSquares = history[history.length - 1];
+  const [currentMoves, setCurrentMoves] = useState(0);
+  const currentSquares = history[currentMoves];
+
+  function jumpTo(nextMove) {
+    setCurrentMoves(nextMove);
+    setXIsNext(nextMove % 2 === 0);
+  }
 
   function handlePlay(nextSquares) {
-    setHistory([...history, nextSquares]);
+    // Perbaiki penyesuaian nilai setCurrentMoves
+    const nextHistory = [...history.slice(0, currentMoves + 1), nextSquares];
+    setHistory(nextHistory);
+    setCurrentMoves(nextHistory.length - 1); // Perbaiki penyesuaian panjang array
     setXIsNext(!xIsNext);
   }
 
-  const moves = history.map((squares, move) => {
-    let description = '';
-    description = move > 0 ? 'Go to move #' + move : 'Go to move game start';
-    return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
-      </li>
-    );
-  });
+  // Gunakan arrow function agar deskripsi berada dalam satu baris
+  const moves = history.map((squares, move) => (
+    <li key={move}>
+      <button onClick={() => jumpTo(move)}>
+        {move ? 'Go to move #' + move : 'Go to move game start'}
+      </button>
+    </li>
+  ));
 
   return (
     <div className="game">
@@ -78,7 +82,7 @@ export default function Game() {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <ol>{/*TODO*/}</ol>
+        <ol>{moves}</ol>
       </div>
     </div>
   );
@@ -99,10 +103,10 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     // Jika ada tiga kotak dengan isi yang sama dalam satu garis, kembalikan isi kotak tersebut sebagai pemenang
-    if (squares[a] === squares[b] && squares[a] === squares[c]) {
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
       return squares[a];
     }
   }
-  // Jika tidak ada pemenang, kembalikan false
-  return false;
+  // Jika tidak ada pemenang, kembalikan null (tidak perlu kembali false)
+  return null;
 }
