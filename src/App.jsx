@@ -68,7 +68,7 @@ export default function Game() {
   }
 
   // Gunakan arrow function agar deskripsi berada dalam satu baris
-  const moves = history.map((squares, move) => (
+  const moves = history.map((move) => (
     <li key={move}>
       <button onClick={() => jumpTo(move)}>
         {move ? 'Go to move #' + move : 'Go to move game start'}
